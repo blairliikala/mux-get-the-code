@@ -281,7 +281,7 @@ class GetPlayerCode extends HTMLElement {
   #makeCodeArea(playercode) {
     if (!playercode) return 'No Code Created';
     const {time, signedMessage} = this.#makeSignedPlaybackWarning();
-    return `<div class="code_container"><div class="copy_text">${this.#buttonTitle} (${ this.#hasToken ? signedMessage : ''})</div><pre><code class="code">${playercode}</code></pre></div>`;
+    return `<div class="code_container"><div class="copy_text">${this.#buttonTitle} ${ this.#hasToken ? signedMessage : ''}</div><pre><code class="code">${playercode}</code></pre></div>`;
   }
 
   #makeSignedPlaybackWarning() {
