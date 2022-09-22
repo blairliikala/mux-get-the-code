@@ -28,9 +28,9 @@ A component to show the code used to run Mux Player. Intended for easier on-boar
 To show a single button to copy the code with, add the code below with your own classes for styling.
 
 ```html
-<player-code ....>
+<mux-player-code ....>
   <button slot="copy-code-button">Copy Mux Player Code</button>
-</player-code>
+</mux-player-code>
 ```
 
 ## Events
@@ -48,13 +48,13 @@ document
 ```
 
 ```html
-<player-code
+<mux-player-code
   params='{ "playback-id":"1234", "stream-type":"on-demand" }'
   copy-button="true"
   show-code="true"
   button-title="Copy Player Code NOW"
   docs="true"
-></player-code>
+></mux-player-code>
 ```
 
 Or pulling from Mux Player directly:
@@ -66,11 +66,11 @@ Or pulling from Mux Player directly:
   title="My Demo Vid"
 ></mux-player>
 
-<player-code
+<mux-player-code
   player-id="DS00Spx1CV902MCtPj5WknGlR102V5HFkDe"
   copy-button="true"
   show-code="true"
   button-title="Copy Player Code NOW"
   docs="true"
-></player-code>
+></mux-player-code>
 ```
