@@ -1,20 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Mux Player Code</title>
     <script defer src="https://unpkg.com/@mux/mux-player"></script>
-    <script defer src="./gethecode.js"></script>
-    <meta name="color-scheme" content="dark light">
+    <script defer src="../src/getthecode.js"></script>
+    <meta name="color-scheme" content="dark light" />
     <style>
       .custom_copy_button_styles {
-        border:1px solid blue;
-        padding:.4em;
+        border: 1px solid blue;
+        padding: 0.4em;
       }
     </style>
   </head>
 
-  <body style="max-width:800px;margin:0 auto;padding:1em">
-
+  <body style="max-width: 800px; margin: 0 auto; padding: 1em">
     <!-- Change to mux-player to test expired (throws lots of console errors) -->
     <div
       id="mux_test_player_1"
@@ -24,7 +23,7 @@
       thumbnail-token="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzQlZFV20wMDRhZm13MTAyeTlZSHdpOGxxMUlrazAxVUtqeWZoT0h0SEt5MkhvIiwiYXVkIjoidCIsImV4cCI6MTY2Mzc3Mjc3Niwia2lkIjoiMDFjOTVuaDJDbHhyMDBETVc5Q0FodFJWSXVQZEYwMTdKR0RKU1BDUXVpeVpvWSJ9.2cBnhUt7e81je_RCLtjBJcJzyuVtqkp4Rxaq5BlkdtzbdxzznYwyTSxUjSfkzi7_M7sdeZ-YwCY7DQYyfbYcmrQIcLy25qICUrGCz6IuSOUTq29U0Muv3EFTzFNMzhyS02skfJ56N24TFHW-ypc0CC-4np_sTdCeu5W9ses8Hi7fj1iSUC4ruRvYBBslRbCeftnVOdz5WCaRYMe79j0WxPTLJPIELoskgjNyfXcfsvlkpJJTK09pxLtal7tMdvlPB-RFbWNjMGIf4Md7Y7-xPsiKZvuSDF6z6l8-6NIgpyDwvchm0kX7edTzPwmM4_RU-cFVIVLGMtMW6qlNDqTJHQ"
       stream-type="on-demand"
       title="Expired Signed Video"
-      style="display:none"
+      style="display: none"
     ></div>
 
     <mux-player
@@ -32,7 +31,7 @@
       playback-id="DS00Spx1CV902MCtPj5WknGlR102V5HFkDe"
       stream-type="on-demand"
       title="My Demo Vid 2"
-      style="display:none"
+      style="display: none"
     ></mux-player>
 
     <mux-player
@@ -40,7 +39,7 @@
       playback-id="S13qMh4BCJE9R00vfHe7H35XsIFMBsHrVZWx8InxX5ds"
       stream-type="on-demand"
       title="My Demo Vid 3"
-      style="display:none"
+      style="display: none"
     ></mux-player>
 
     <mux-player
@@ -57,12 +56,11 @@
       show-code="true"
       button-title="Copy Player Code NOW"
       docs="true"
-      >
+    >
       <!--<button slot="copy-code-button" class="custom_copy_button_styles">Fancy Custom Button</button>-->
     </mux-player-code>
 
-
-    <section style="margin-top:6em">
+    <section style="margin-top: 6em">
       <hr />
       <h3>Testing</h3>
       <button id="add_by_param">Change Playback ID by class param</button>
@@ -78,75 +76,72 @@
       <button id="add_custom_copy_button">Add Custom Copy Button</button>
       <button id="remove_custom_button">Remove Custom Button</button>
     </section>
-
   </body>
 
-<script type="module">
-  const code = document.querySelector('mux-player-code');
-  const testplayer = document.querySelector('#mux_test_player_1');
+  <script type="module">
+    const code = document.querySelector('mux-player-code');
+    const testplayer = document.querySelector('#mux_test_player_1');
 
-  code.addEventListener('copied', (event) => console.log("Fired Event Listener Copied ", event) );
-  
-  document.querySelector('#add_signed1').onclick = () => {
-    const playerId = 'mux_test_player_1';
-    console.log('Modifying playback to be '+playerId);
-    code.playerId = playerId;
-    console.log(code)
-  }
-  document.querySelector('#add_by_param').onclick = () => {
-    const playerId = 'mux_test_player_2';
-    console.log('Modifying playback to be '+playerId);
-    code.playerId = playerId;
-    console.log(code)
-  }
-  document.querySelector('#add_by_attribute').onclick = () => {
-    const playerId = 'mux_test_player_2';
-    console.log('Modifying playback to be '+playerId);
-    code.setAttribute('player-id', playerId);
-    console.log(code)
-  }
-  document.querySelector('#change_title').onclick = () => {
-    const now = new Date();
-    console.log('Setting Title to '+now)
-    code.setAttribute('button-title', now);
-    console.log(code)
-  }
-  document.querySelector('#remove_moreinfo').onclick = () => {
-    console.log('Removing more info')
-    code.removeAttribute('docs');
-    console.log(code)
-  }
-  document.querySelector('#remove_copybutton').onclick = () => {
-    console.log('Remove Copy Button')
-    code.removeAttribute('show-copy-button');
-    console.log(code)
-  }
+    code.addEventListener('copied', (event) =>
+      console.log('Fired Event Listener Copied ', event)
+    );
 
-  document.querySelector('#copy_mux_player').onclick = () => {
-    console.log("Copying Mux Player's Setup Code");
-    const playerId = 'mux_test_player_3';
-    code.removeAttribute('params');
-    code.setAttribute('player-id', playerId);
-  }
+    document.querySelector('#add_signed1').onclick = () => {
+      const playerId = 'mux_test_player_1';
+      console.log('Modifying playback to be ' + playerId);
+      code.playerId = playerId;
+      console.log(code);
+    };
+    document.querySelector('#add_by_param').onclick = () => {
+      const playerId = 'mux_test_player_2';
+      console.log('Modifying playback to be ' + playerId);
+      code.playerId = playerId;
+      console.log(code);
+    };
+    document.querySelector('#add_by_attribute').onclick = () => {
+      const playerId = 'mux_test_player_2';
+      console.log('Modifying playback to be ' + playerId);
+      code.setAttribute('player-id', playerId);
+      console.log(code);
+    };
+    document.querySelector('#change_title').onclick = () => {
+      const now = new Date();
+      console.log('Setting Title to ' + now);
+      code.setAttribute('button-title', now);
+      console.log(code);
+    };
+    document.querySelector('#remove_moreinfo').onclick = () => {
+      console.log('Removing more info');
+      code.removeAttribute('docs');
+      console.log(code);
+    };
+    document.querySelector('#remove_copybutton').onclick = () => {
+      console.log('Remove Copy Button');
+      code.removeAttribute('show-copy-button');
+      console.log(code);
+    };
 
-  document.querySelector('#add_custom_copy_button').onclick = () => {
-    console.log("Adding custom copy button");
-    const buttonHTML = `<button slot="copy-code-button">JS-added Copy Button</button>`;
-    code.innerHTML = buttonHTML;
-  }
-  document.querySelector('#remove_custom_button').onclick = () => {
-    console.log("Removing custom copy button");
-    code.innerHTML = '';
-  }
-  document.querySelector('#add_default_copybutton').onclick = () => {
-    console.log("Adding default copy button");
-    code.setAttribute('show-copy-button', true);
-  }
+    document.querySelector('#copy_mux_player').onclick = () => {
+      console.log("Copying Mux Player's Setup Code");
+      const playerId = 'mux_test_player_3';
+      code.removeAttribute('params');
+      code.setAttribute('player-id', playerId);
+    };
 
-</script>
+    document.querySelector('#add_custom_copy_button').onclick = () => {
+      console.log('Adding custom copy button');
+      const buttonHTML = `<button slot="copy-code-button">JS-added Copy Button</button>`;
+      code.innerHTML = buttonHTML;
+    };
+    document.querySelector('#remove_custom_button').onclick = () => {
+      console.log('Removing custom copy button');
+      code.innerHTML = '';
+    };
+    document.querySelector('#add_default_copybutton').onclick = () => {
+      console.log('Adding default copy button');
+      code.setAttribute('show-copy-button', true);
+    };
+  </script>
 
-
-<script type="module">
-
-</script>
+  <script type="module"></script>
 </html>

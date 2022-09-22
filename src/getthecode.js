@@ -1,17 +1,19 @@
 class GetPlayerCode extends HTMLElement {
   #isInit = false;
-  #params = false;
-  #playback = false;
+  #params = null;
+  #playback = null;
   #copyButton = false;
   #showCode = false;
-  #buttonTitle = false;
+  #buttonTitle = '';
   #docs = false;
 
   playercode = '';
   divs = {
     'root' : {},
     'copyButton' : {},
-    'moreInfo' : {}
+    'moreInfo' : {},
+    'signedMessage' : {},
+    'code': {}
   }
 
   #hasToken = false;
@@ -114,7 +116,7 @@ class GetPlayerCode extends HTMLElement {
     return ['player-id', 'params', 'show-copy-button', 'show-code', 'button-title', 'docs']
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback() {
     this.#create();
   }
 
@@ -122,7 +124,6 @@ class GetPlayerCode extends HTMLElement {
     this.setAttribute('player-id', item);
   }
   set params(item) {
-    this.#params = item;
     this.setAttribute('params', item)
   }
   set showCopyButton(value) {
@@ -133,7 +134,7 @@ class GetPlayerCode extends HTMLElement {
     return this.#hasToken;
   }
   get expirationTime() {
-    const {time} = makeSignedPlaybackWarning();
+    const {time} = this.#makeSignedPlaybackWarning();
     return time;
   }
 
@@ -167,6 +168,7 @@ class GetPlayerCode extends HTMLElement {
       'copyButton' : this.shadowRoot?.querySelector('slot[name=copy-code-button]'),
       'signedMessage' : this.shadowRoot?.querySelector('#signed_message'),
       'moreInfo' : this.shadowRoot?.querySelector('#more_info'),
+      'code' : undefined
     }
 
     this.#create();
@@ -208,9 +210,9 @@ class GetPlayerCode extends HTMLElement {
       ...playerParams
     }
 
-    this.#hasToken = Object.keys(params).find( key => key === 'playback-token');
+    this.#hasToken = Object.keys(params).find( key => key === 'playback-token') !== undefined;
     if (this.#hasToken) {
-      let token = Object.entries(params).find( (key, value) => key[0] === 'playback-token' );
+      let token = Object.entries(params).find( (key) => key[0] === 'playback-token' );
       this.#token = token[1];
     }
 
@@ -221,7 +223,7 @@ class GetPlayerCode extends HTMLElement {
     if (this.#showCode) this.divs.root.innerHTML += codearea;
 
     if (this.#showCode && this.shadowRoot) {
-      this.divs.code = this.shadowRoot.querySelector('.code_container');
+      this.divs.code = this.shadowRoot?.querySelector('.code_container');
       if (this.divs.code) this.#setCopyEvent(this.#renderHTML(this.playercode), this.divs.code);
     }
 
@@ -274,18 +276,18 @@ class GetPlayerCode extends HTMLElement {
         html += `${name}="${value}"
     `;
       }
-    };
+    }
     return html;
   }
 
   #makeCodeArea(playercode) {
     if (!playercode) return 'No Code Created';
-    const {time, signedMessage} = this.#makeSignedPlaybackWarning();
+    const {signedMessage} = this.#makeSignedPlaybackWarning();
     return `<div class="code_container"><div class="copy_text">${this.#buttonTitle} ${ this.#hasToken ? signedMessage : ''}</div><pre><code class="code">${playercode}</code></pre></div>`;
   }
 
   #makeSignedPlaybackWarning() {
-    let time = '';
+    let time;
     let signedMessage = '';
     let isExpired = false;
 
@@ -294,7 +296,7 @@ class GetPlayerCode extends HTMLElement {
       let hasRestrictions = 'playback_restriction_id' in jwt;
       let expiration = new Date(0).setUTCSeconds(jwt.exp);
       time = this.getRelativeTimeDistance(expiration);
-      isExpired = expiration < new Date();
+      isExpired = expiration < new Date().getTime();
 
       if (isExpired) {
         signedMessage = `<span class="signed">Signed, expired ${time}.</span>`;
@@ -311,12 +313,12 @@ class GetPlayerCode extends HTMLElement {
 
     div.addEventListener('click', () => {
       navigator.clipboard.writeText(code).then(() => {
-        this.dispatchEvent(new CustomEvent('copied', { details: code}));
-        const copy_text = this.shadowRoot.querySelector('.copy_text');
+        this.dispatchEvent(new CustomEvent('copied', { detail: code}));
+        const copy_text = this.shadowRoot?.querySelector('.copy_text');
         if (copy_text) {
           copy_text.append(this.#successfullCopyDiv())
           setTimeout( () => {
-            let confirm = copy_text.parentElement.querySelector('.confirm_copied');
+            let confirm = copy_text.parentElement?.querySelector('.confirm_copied');
             if (confirm) confirm.remove();
           }, 3000)
         }
@@ -328,7 +330,7 @@ class GetPlayerCode extends HTMLElement {
     if (!div || !code) return;
 
     div.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('copied', { details: code}));
+      this.dispatchEvent(new CustomEvent('copied', { detail: code}));
       navigator.clipboard.writeText(code).then(() => {
         let button = div.querySelector('button');
         button.classList.add('clicked');
