@@ -363,7 +363,7 @@ class GetPlayerCode extends HTMLElement {
   }
 
   #getDocsText() {
-    return `<p>Learn more about <a href="https://docs.mux.com/guides/video/mux-player">Mux Player</a></p>`;
+    return `<p>Learn more about <a href="https://docs.mux.com/guides/video/mux-player" target="_blank">Mux Player</a></p>`;
   }
 
   // &lt;string&gt; to <string>
