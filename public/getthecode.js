@@ -1,21 +1,19 @@
 class GetPlayerCode extends HTMLElement {
   #isInit = false;
-  #params = null;
-  #playback = null;
+  #params = '';
+  #playback = '';
   #copyButton = false;
   #showCode = false;
   #buttonTitle = '';
   #docs = false;
-
-  playercode = '';
-  divs = {
-    'root' : {},
-    'copyButton' : {},
-    'moreInfo' : {},
-    'signedMessage' : {},
-    'code': {}
-  }
-
+  #playercode = '';
+  #divs = {
+    root: {},
+    copyButton: {},
+    moreInfo: {},
+    signedMessage: {},
+    code: {},
+  };
   #hasToken = false;
   #copyButtonListenerSet = false;
   #token = '';
@@ -113,7 +111,14 @@ class GetPlayerCode extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['player-id', 'params', 'show-copy-button', 'show-code', 'button-title', 'docs']
+    return [
+      'player-id',
+      'params',
+      'show-copy-button',
+      'show-code',
+      'button-title',
+      'docs',
+    ];
   }
 
   attributeChangedCallback() {
@@ -124,17 +129,17 @@ class GetPlayerCode extends HTMLElement {
     this.setAttribute('player-id', item);
   }
   set params(item) {
-    this.setAttribute('params', item)
+    this.setAttribute('params', item);
   }
   set showCopyButton(value) {
-    if (value) this.setAttribute('show-copy-button', 'true')
+    if (value) this.setAttribute('show-copy-button', 'true');
     if (!value) this.removeAttribute('show-copy-button');
   }
   get hasToken() {
     return this.#hasToken;
   }
   get expirationTime() {
-    const {time} = this.#makeSignedPlaybackWarning();
+    const { time } = this.#makeSignedPlaybackWarning();
     return time;
   }
 
@@ -163,25 +168,24 @@ class GetPlayerCode extends HTMLElement {
     const html = template.content.cloneNode(true);
     shadow.appendChild(html);
 
-    this.divs = {
-      'root' : this.shadowRoot?.querySelector('#root'),
-      'copyButton' : this.shadowRoot?.querySelector('slot[name=copy-code-button]'),
-      'signedMessage' : this.shadowRoot?.querySelector('#signed_message'),
-      'moreInfo' : this.shadowRoot?.querySelector('#more_info'),
-      'code' : undefined
-    }
+    this.#divs = {
+      root: this.shadowRoot?.querySelector('#root'),
+      copyButton: this.shadowRoot?.querySelector('slot[name=copy-code-button]'),
+      signedMessage: this.shadowRoot?.querySelector('#signed_message'),
+      moreInfo: this.shadowRoot?.querySelector('#more_info'),
+      code: undefined,
+    };
 
     this.#create();
   }
 
   #create() {
-
-    this.#params      = this.getAttribute('params');
-    this.#playback    = this.getAttribute('player-id');
-    this.#copyButton  = this.hasAttribute('show-copy-button');
-    this.#showCode    = this.hasAttribute('show-code');
-    this.#buttonTitle = this.getAttribute('button-title');
-    this.#docs        = this.hasAttribute('docs');
+    this.#params = this.getAttribute('params') || '';
+    this.#playback = this.getAttribute('player-id') || '';
+    this.#copyButton = this.hasAttribute('show-copy-button');
+    this.#showCode = this.hasAttribute('show-code');
+    this.#buttonTitle = this.getAttribute('button-title') || '';
+    this.#docs = this.hasAttribute('docs');
 
     if (!this.#buttonTitle) this.#buttonTitle = 'Copy Player Code';
 
@@ -190,10 +194,10 @@ class GetPlayerCode extends HTMLElement {
 
     if (this.#playback) {
       const player = document.querySelector(`#${this.#playback}`);
-      if ( player && player.hasAttributes() ) {
+      if (player && player.hasAttributes()) {
         for (const attr of player.attributes) {
           playerParams[attr.name] = attr.value;
-         }
+        }
       }
     }
 
@@ -201,56 +205,62 @@ class GetPlayerCode extends HTMLElement {
       try {
         attributeParams = typeof(this.#params) === 'string' ? JSON.parse(this.#params) : this.#params;
       } catch(e) {
-        console.error('JSON decode failed. Check the parameter has valid JSON.')
+        console.error(
+          'JSON decode failed. Check the parameter has valid JSON.'
+        );
       }
     }
 
     const params = {
       ...attributeParams,
-      ...playerParams
-    }
+      ...playerParams,
+    };
 
-    this.#hasToken = Object.keys(params).find( key => key === 'playback-token') !== undefined;
+    this.#hasToken = Object.keys(params).find(key => key === 'playback-token') !== undefined;
     if (this.#hasToken) {
-      let token = Object.entries(params).find( (key) => key[0] === 'playback-token' );
-      this.#token = token[1];
+      let token = Object.entries(params).find(key => key[0] === 'playback-token' );
+      if (token && token.length > 0) this.#token = token[1];
     }
 
-    this.divs.root.innerHTML = "";
+    this.#divs.root.innerHTML = '';
 
-    this.playercode = this.#createCode(params);
-    const codearea = this.#makeCodeArea(this.playercode);
-    if (this.#showCode) this.divs.root.innerHTML += codearea;
+    this.#playercode = this.#createCode(params);
+    const codearea = this.#makeCodeArea(this.#playercode);
+    if (this.#showCode) {
+      this.#divs.root.innerHTML += codearea;
+    }
 
     if (this.#showCode && this.shadowRoot) {
-      this.divs.code = this.shadowRoot?.querySelector('.code_container');
-      if (this.divs.code) this.#setCopyEvent(this.#renderHTML(this.playercode), this.divs.code);
+      this.#divs.code = this.shadowRoot?.querySelector('.code_container');
+      if (this.#divs.code) {
+        this.#setCopyEvent(this.#renderHTML(this.#playercode), this.#divs.code);
+      }
     }
 
-    if (this.divs.copyButton && this.playercode && !this.#copyButtonListenerSet) {
-      this.#setCopyButtonEvent( this.#renderHTML(this.playercode), this.divs.copyButton);
+    if (this.#divs.copyButton && this.#playercode && !this.#copyButtonListenerSet) {
+      this.#setCopyButtonEvent(this.#renderHTML(this.#playercode), this.#divs.copyButton);
       this.#copyButtonListenerSet = true;
     }
     if (this.#copyButton) {
-      this.divs.copyButton.style.display = 'unset';
+      this.#divs.copyButton.style.display = 'unset';
     }
     if (!this.#copyButton) {
-      this.divs.copyButton.style.display = 'none';
+      this.#divs.copyButton.style.display = 'none';
     }
 
-    if (this.divs.signedMessage) {
-      const {time, isExpired} = this.#makeSignedPlaybackWarning();
+    if (this.#divs.signedMessage) {
+      const { time, isExpired } = this.#makeSignedPlaybackWarning();
       if (isExpired) {
-        this.divs.signedMessage.innerHTML = `${ this.#hasToken ? `<div class="signed_message expired">This signed playback ID expired ${time}.</div>` : ''}`;
+        this.#divs.signedMessage.innerHTML = `${ this.#hasToken ? `<div class="signed_message expired">This signed playback ID expired ${time}.</div>` : ''}`;
       } else {
-        this.divs.signedMessage.innerHTML = `${ this.#hasToken ? `<div class="signed_message">This signed playback ID will expire ${time}.</div>` : ''}`;
+        this.#divs.signedMessage.innerHTML = `${ this.#hasToken ? `<div class="signed_message">This signed playback ID will expire ${time}.</div>` : ''}`;
       }
     }
 
     if (this.#docs && this.shadowRoot) {
-      this.divs.moreInfo.innerHTML = this.#getDocsText();
+      this.#divs.moreInfo.innerHTML = this.#getDocsText();
     } else {
-      this.divs.moreInfo.innerHTML = '';
+      this.#divs.moreInfo.innerHTML = '';
     }
 
   }
@@ -282,7 +292,7 @@ class GetPlayerCode extends HTMLElement {
 
   #makeCodeArea(playercode) {
     if (!playercode) return 'No Code Created';
-    const {signedMessage} = this.#makeSignedPlaybackWarning();
+    const { signedMessage } = this.#makeSignedPlaybackWarning();
     return `<div class="code_container"><div class="copy_text">${this.#buttonTitle} ${ this.#hasToken ? signedMessage : ''}</div><pre><code class="code">${playercode}</code></pre></div>`;
   }
 
@@ -305,7 +315,7 @@ class GetPlayerCode extends HTMLElement {
       }
     }
 
-    return {time, signedMessage, isExpired}
+    return { time, signedMessage, isExpired };
   }
 
   #setCopyEvent(code, div) {
@@ -313,39 +323,41 @@ class GetPlayerCode extends HTMLElement {
 
     div.addEventListener('click', () => {
       navigator.clipboard.writeText(code).then(() => {
-        this.dispatchEvent(new CustomEvent('copied', { detail: code}));
+        this.dispatchEvent(new CustomEvent('copied', { detail: code }));
         const copy_text = this.shadowRoot?.querySelector('.copy_text');
         if (copy_text) {
-          copy_text.append(this.#successfullCopyDiv())
-          setTimeout( () => {
-            let confirm = copy_text.parentElement?.querySelector('.confirm_copied');
-            if (confirm) confirm.remove();
-          }, 3000)
+          if (!copy_text.querySelector('.confirm_copied')) {
+            copy_text.append(this.#successfullCopyDiv());
+            setTimeout(() => {
+              let confirm = copy_text.parentElement?.querySelector('.confirm_copied');
+              if (confirm) confirm.remove();
+            }, 3000);
+          }
         }
-      })
-    })
+      });
+    });
   }
 
   #setCopyButtonEvent(code, div) {
     if (!div || !code) return;
 
     div.addEventListener('click', () => {
-      this.dispatchEvent(new CustomEvent('copied', { detail: code}));
+      this.dispatchEvent(new CustomEvent('copied', { detail: code }));
       navigator.clipboard.writeText(code).then(() => {
         let button = div.querySelector('button');
         button.classList.add('clicked');
         button.innerText = 'Copied!';
-        setTimeout( () => {
+        setTimeout(() => {
           button.innerText = 'Copy Player Code';
           button.classList.remove('clicked');
-        }, 5000)
-      })
-    })
+        }, 5000);
+      });
+    });
   }
 
   #successfullCopyDiv() {
     const div = document.createElement('span');
-    div.classList.add('confirm_copied')
+    div.classList.add('confirm_copied');
     div.innerText = 'Copied!';
     return div;
   }
@@ -356,19 +368,19 @@ class GetPlayerCode extends HTMLElement {
 
   // &lt;string&gt; to <string>
   #renderHTML(string) {
-    string = string.replaceAll('&lt;', "<")
-    string = string.replaceAll('&gt;', '>')
-    string = string.replaceAll('&quot;', '"')
-    string = string.replaceAll('&quot;', "'")
+    string = string.replaceAll('&lt;', '<');
+    string = string.replaceAll('&gt;', '>');
+    string = string.replaceAll('&quot;', '"');
+    string = string.replaceAll('&quot;', "'");
     return string;
   }
 
   // <string> to &lt;string&gt;
   #encodeHTML(string) {
-    string = string.replaceAll('<', '&lt;')
-    string = string.replaceAll('"', '&quot;')
-    string = string.replaceAll('>', '&gt;')
-    string = string.replaceAll("'", '&quot;')
+    string = string.replaceAll('<', '&lt;');
+    string = string.replaceAll('"', '&quot;');
+    string = string.replaceAll('>', '&gt;');
+    string = string.replaceAll("'", '&quot;');
     return string;
   }
 
@@ -376,7 +388,7 @@ class GetPlayerCode extends HTMLElement {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 
     return JSON.parse(jsonPayload);
@@ -384,18 +396,18 @@ class GetPlayerCode extends HTMLElement {
 
   getRelativeTimeDistance(d1, d2 = new Date()) {
     const units = {
-      year  : 24 * 60 * 60 * 1000 * 365,
-      month : 24 * 60 * 60 * 1000 * 365/12,
-      day   : 24 * 60 * 60 * 1000,
-      hour  : 60 * 60 * 1000,
+      year:   24 * 60 * 60 * 1000 * 365,
+      month:  24 * 60 * 60 * 1000 * 365/12,
+      day:    24 * 60 * 60 * 1000,
+      hour:   60 * 60 * 1000,
       minute: 60 * 1000,
-      second: 1000
-    }
-    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
+      second: 1000,
+    };
+    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
     const elapsed = d1 - d2;
     for (var u in units)
       if (Math.abs(elapsed) > units[u] || u == 'second')
-        return rtf.format(Math.round(elapsed/units[u]),u)
+        return rtf.format(Math.round(elapsed / units[u]), u);
   }
 
 }
