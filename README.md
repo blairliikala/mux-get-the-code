@@ -61,13 +61,14 @@ Or pulling from Mux Player directly:
 
 ```html
 <mux-player
+  id="myPlayer"
   playback-id="DS00Spx1CV902MCtPj5WknGlR102V5HFkDe"
   stream-type="on-demand"
   title="My Demo Vid"
 ></mux-player>
 
 <mux-player-code
-  player-id="DS00Spx1CV902MCtPj5WknGlR102V5HFkDe"
+  player-id="myPlayer"
   copy-button="true"
   show-code="true"
   button-title="Copy Player Code NOW"
